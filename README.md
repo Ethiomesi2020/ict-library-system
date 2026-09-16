@@ -83,4 +83,7 @@ These instructions will let you copy the project and running on your local machi
 
 #### Running
 
-- $ python project.py
+- $ python project.py runserver
+
+- http://127.0.0.1:5000/ 
+
