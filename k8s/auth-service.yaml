@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-service
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: auth
+  template:
+    metadata:
+      labels:
+        app: auth
+    spec:
+      containers:
+      - name: auth
+        image: yourusername/ict-auth-service:latest
+        env:
+        # Notice how it connects using the name of the postgres-service defined above
+        - name: DATABASE_URL
+          value: "postgresql://user:pass@postgres-service:5432/librarydb"
+        - name: JWT_SECRET
+          value: "super-secret-key"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: auth
+  ports:
+  - port: 5000
+    targetPort: 5000
