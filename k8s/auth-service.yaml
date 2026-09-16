@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: auth
-        image: yourusername/ict-auth-service:latest
+        image: messay2025/ict-auth-service:latest
         env:
         # Notice how it connects using the name of the postgres-service defined above
         - name: DATABASE_URL

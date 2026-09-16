@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: library
-        image: yourusername/ict-library-service:latest
+        image: messay2025/ict-library-service:latest
         env:
         - name: DATABASE_URL
           value: "postgresql://user:pass@postgres-service:5432/librarydb"
