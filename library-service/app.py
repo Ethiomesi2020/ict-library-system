@@ -7,7 +7,7 @@ from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager, jwt_required, get_jwt_identity
 
-appp = Flask(__name__)
+app = Flask(__name__)
 CORS(app) # Add this line to allow browser requests
 
 # Connect to the same PostgreSQL database

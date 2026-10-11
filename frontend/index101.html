@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+        <link href="styles.css" rel="stylesheet">
+
+        <title>ICT Library System</title>
+
+    </head>
+	
+    <body>
+	
+        <br>
+		<h1> <center> ICT Library System </center> </h1>
+		<br> 
+		<br>	
+		
+		<!-- Status Console -->
+		<div class="card">
+			<h2>&#x2009; System Log</h2>
+			<div id="log">
+			&#x2009;&#x2009;&#x2009;&#x2009;&#x2009;
+			Awaiting action ...
+			</div>
+		</div>
+	
+        <div class="container">
+            <form>
+                <div class="card">
+                    <div class="card-body all_center">
+                        <table style="width: 100%;">
+                            <tr>
+                                <td>
+								
+									<!-- Auth Section -->
+									<div class="card" id="auth-section">
+										<h2>Authentication</h2>
+										<input type="text" id="username" placeholder="Username">
+										<br>
+										<br>
+										<input type="password" id="password" placeholder="Password">
+										<br> 
+										<br>						
+										<div class="row">
+											&#x2009;&#x2009;
+											<button onclick="register()">Register</button>
+											&#x2009;&#x2009;
+											<button onclick="login()" style="background: #eab308; color: blue;">Login</button>
+										</div>
+										
+									</div>									
+				
+									<!-- Library Section -->
+									<div class="card hidden" id="library-section">
+										<h2>Library Actions</h2>
+										<button onclick="logout()" style="background: #ef4444; margin-bottom: 1rem;">Logout</button>
+										
+										<h3>Borrow or Return a Book</h3>
+										<input type="text" id="bookTitle" placeholder="Book Title (e.g., Clean Code)">
+										<br>
+										<div class="row">
+											<br>
+											<button onclick="borrowBook()">Borrow Book</button>
+											&#x2009;&#x2009;
+											<button onclick="returnBook()" style="background: #eab308; color: black;">Return Book</button>
+										</div>
+										
+										<hr style="margin: 1.5rem 0; border: 0; border-top: 1px solid #e4e4e7;">
+										
+										<h3>View Online Catalog</h3>
+										<input type="text" id="csvUrl" value="https://raw.githubusercontent.com/cs109/2014_data/master/countries.csv" placeholder="CSV URL">
+										<button onclick="fetchBooks()">Fetch Books via Microservice</button>
+									</div>				
+                                </td>
+                            </tr>
+                        </table>
+					</div>
+                </div>
+            </form>			
+        </div>
+
+		<script>
+			const AUTH_URL = 'http://localhost:5000';
+			const LIB_URL = 'http://localhost:5001';
+			let jwtToken = localStorage.getItem('library_jwt');
+
+			// UI toggler based on login status
+			function updateUI() {
+				if (jwtToken) {
+					document.getElementById('auth-section').classList.add('hidden');
+					document.getElementById('library-section').classList.remove('hidden');
+					logMsg("System: Logged in. JWT token active.");
+				} else {
+					document.getElementById('auth-section').classList.remove('hidden');
+					document.getElementById('library-section').classList.add('hidden');
+				}
+			}
+
+			function logMsg(msg) {
+				const logEl = document.getElementById('log');
+				logEl.textContent = msg + "\n" + logEl.textContent;
+			}
+
+			// --- Auth Service Calls ---
+			async function register() {
+				const u = document.getElementById('username').value;
+				const p = document.getElementById('password').value;
+				try {
+					const res = await fetch(`${AUTH_URL}/register`, {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({ username: u, password: p })
+					});
+					const data = await res.json();
+					logMsg(`Register: ${data.msg || JSON.stringify(data)}`);
+				} catch (err) { logMsg(`Register Error: ${err}`); }
+			}
+
+			async function login() {
+				const u = document.getElementById('username').value;
+				const p = document.getElementById('password').value;
+				try {
+					const res = await fetch(`${AUTH_URL}/login`, {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({ username: u, password: p })
+					});
+					const data = await res.json();
+					if (data.access_token) {
+						jwtToken = data.access_token;
+						localStorage.setItem('library_jwt', jwtToken);
+						updateUI();
+					} else {
+						logMsg(`Login Failed: ${data.msg}`);
+					}
+				} catch (err) { logMsg(`Login Error: ${err}`); }
+			}
+
+			function logout() {
+				jwtToken = null;
+				localStorage.removeItem('library_jwt');
+				updateUI();
+				logMsg("System: Logged out.");
+			}
+
+			// --- Library Service Calls ---
+			async function fetchBooks() {
+				const url = document.getElementById('csvUrl').value;
+				try {
+					const res = await fetch(`${LIB_URL}/books?url=${encodeURIComponent(url)}`);
+					const data = await res.json();
+					logMsg(`Fetched ${data.available_books?.length || 0} records. Check browser console for full payload.`);
+					console.log(data);
+				} catch (err) { logMsg(`Fetch Error: ${err}`); }
+			}
+
+			async function borrowBook() {
+				const title = document.getElementById('bookTitle').value;
+				const author = document.getElementById('bookAuthor').value;
+				try {
+					const res = await fetch(`${LIB_URL}/borrow`, {
+						method: 'POST',
+						headers: { 
+							'Content-Type': 'application/json',
+							'Authorization': `Bearer ${jwtToken}`
+						},
+						body: JSON.stringify({ book_title: title, author: author })
+					});
+					const data = await res.json();
+					logMsg(`Borrow: ${data.msg || JSON.stringify(data)}`);
+				} catch (err) { logMsg(`Borrow Error: ${err}`); }
+			}
+
+			async function returnBook() {
+				const title = document.getElementById('bookTitle').value;
+				try {
+					const res = await fetch(`${LIB_URL}/return`, {
+						method: 'POST',
+						headers: { 
+							'Content-Type': 'application/json',
+							'Authorization': `Bearer ${jwtToken}`
+						},
+						body: JSON.stringify({ book_title: title })
+					});
+					const data = await res.json();
+					logMsg(`Return: ${data.msg || JSON.stringify(data)}`);
+				} catch (err) { logMsg(`Return Error: ${err}`); }
+			}		
+			
+			// Initialize UI on load
+			updateUI();
+		</script>	
+		
+    </body>
+</html>
+
+
