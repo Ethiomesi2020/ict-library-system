@@ -1,211 +1,385 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-    <head>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="styles.css" rel="stylesheet">
+  <title>ICT Library System</title>
+</head>
 
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-        <title>ICT Library System</title>
-		
-		<style>
-        body { font-family: system-ui, -apple-system, sans-serif; max-width: 800px; margin: 2rem auto; padding: 0 1rem; background: #f4f4f5; }
-        .card { background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 1.5rem; }
-        h1, h2 { color: #18181b; margin-top: 0; }
-        input, button { padding: 0.5rem; margin: 0.25rem 0; width: 100%; box-sizing: border-box; }
-        button { background: #2563eb; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
-        button:hover { background: #1d4ed8; }
-        .row { display: flex; gap: 0.5rem; }
-        .row button { flex: 1; }
-        #log { background: #1e293b; color: #4ade80; padding: 1rem; border-radius: 4px; font-family: monospace; height: 100px; overflow-y: auto; white-space: pre-wrap;}
-        .hidden { display: none; }
-		</style>
-		
-    </head>
-	
-    <body>
-	
-        <br>
-		<h1> <center> ICT Library System </center> </h1>
-		<br> 
-		<br>	
-		
-		<!-- Status Console -->
+<body>
+	<br>
+	<h1> <center> ICT Library System </center> </h1>
+	<br> 
+	<br>	
+
+	<!-- Status Console -->
+	<div class="card">
+		<h2>&#x2009; System Log</h2>
+		<div id="log">Waiting an action ...</div>
+	</div>
+
+	<div class="container">
 		<div class="card">
-			<h2>&#x2009; System Log</h2>
-			<div id="log">
-			&#x2009;&#x2009;&#x2009;&#x2009;&#x2009;
-			Awaiting action ...
-			</div>
-		</div>
-	
-        <div class="container">
-            <form>
-                <div class="card">
-                    <div class="card-body all_center">
-                        <table style="width: 100%;">
-                            <tr>
-                                <td>
+			<div class="card-body all_center">
+				<table style="width: 100%;">
+					<tr>
+						<td>
+
+							<!-- Auth Section -->
+							<div class="card" id="auth-section">
+								<h2>Authentication</h2>
+								<input type="text" id="username" placeholder="Username">
+								<br>
+								<br>
+								<input type="password" id="password" placeholder="Password">
+								<br> 
+								<br>						
+								<div class="row">
+									&#x2009;&#x2009;
+									<button onclick="register()">Register</button>
+									&#x2009;&#x2009;
+									<button onclick="login()" style="background: #eab308; color: blue;">Login</button>
+								</div>
 								
-									<!-- Auth Section -->
-									<div class="card" id="auth-section">
-										<h2>Authentication</h2>
-										<input type="text" id="username" placeholder="Username">
-										<br>
-										<br>
-										<input type="password" id="password" placeholder="Password">
-										<br> 
-										<br>						
-										<div class="row">
-											&#x2009;&#x2009;
-											<button onclick="register()">Register</button>
-											&#x2009;&#x2009;
-											<button onclick="login()" style="background: #eab308; color: blue;">Login</button>
-										</div>
-										
-									</div>									
-				
-									<!-- Library Section -->
-									<div class="card hidden" id="library-section">
-										<h2>Library Actions</h2>
-										<button onclick="logout()" style="background: #ef4444; margin-bottom: 1rem;">Logout</button>
-										
-										<h3>Borrow or Return a Book</h3>
-										<input type="text" id="bookTitle" placeholder="Book Title (e.g., Clean Code)">
-										<br>
-										<div class="row">
-											<br>
-											<button onclick="borrowBook()">Borrow Book</button>
-											&#x2009;&#x2009;
-											<button onclick="returnBook()" style="background: #eab308; color: black;">Return Book</button>
-										</div>
-										
-										<hr style="margin: 1.5rem 0; border: 0; border-top: 1px solid #e4e4e7;">
-										
-										<h3>View Online Catalog</h3>
-										<input type="text" id="csvUrl" value="https://raw.githubusercontent.com/cs109/2014_data/master/countries.csv" placeholder="CSV URL">
-										<button onclick="fetchBooks()">Fetch Books via Microservice</button>
-									</div>				
-                                </td>
-                            </tr>
-                        </table>
-					</div>
-                </div>
-            </form>			
-        </div>
-
-		<script>
-			const AUTH_URL = 'http://localhost:5000';
-			const LIB_URL = 'http://localhost:5001';
-			let jwtToken = localStorage.getItem('library_jwt');
-
-			// UI toggler based on login status
-			function updateUI() {
-				if (jwtToken) {
-					document.getElementById('auth-section').classList.add('hidden');
-					document.getElementById('library-section').classList.remove('hidden');
-					logMsg("System: Logged in. JWT token active.");
-				} else {
-					document.getElementById('auth-section').classList.remove('hidden');
-					document.getElementById('library-section').classList.add('hidden');
-				}
-			}
-
-			function logMsg(msg) {
-				const logEl = document.getElementById('log');
-				logEl.textContent = msg + "\n" + logEl.textContent;
-			}
-
-			// --- Auth Service Calls ---
-			async function register() {
-				const u = document.getElementById('username').value;
-				const p = document.getElementById('password').value;
-				try {
-					const res = await fetch(`${AUTH_URL}/register`, {
-						method: 'POST',
-						headers: { 'Content-Type': 'application/json' },
-						body: JSON.stringify({ username: u, password: p })
-					});
-					const data = await res.json();
-					logMsg(`Register: ${data.msg || JSON.stringify(data)}`);
-				} catch (err) { logMsg(`Register Error: ${err}`); }
-			}
-
-			async function login() {
-				const u = document.getElementById('username').value;
-				const p = document.getElementById('password').value;
-				try {
-					const res = await fetch(`${AUTH_URL}/login`, {
-						method: 'POST',
-						headers: { 'Content-Type': 'application/json' },
-						body: JSON.stringify({ username: u, password: p })
-					});
-					const data = await res.json();
-					if (data.access_token) {
-						jwtToken = data.access_token;
-						localStorage.setItem('library_jwt', jwtToken);
-						updateUI();
-					} else {
-						logMsg(`Login Failed: ${data.msg}`);
-					}
-				} catch (err) { logMsg(`Login Error: ${err}`); }
-			}
-
-			function logout() {
-				jwtToken = null;
-				localStorage.removeItem('library_jwt');
-				updateUI();
-				logMsg("System: Logged out.");
-			}
-
-			// --- Library Service Calls ---
-			async function fetchBooks() {
-				const url = document.getElementById('csvUrl').value;
-				try {
-					const res = await fetch(`${LIB_URL}/books?url=${encodeURIComponent(url)}`);
-					const data = await res.json();
-					logMsg(`Fetched ${data.available_books?.length || 0} records. Check browser console for full payload.`);
-					console.log(data);
-				} catch (err) { logMsg(`Fetch Error: ${err}`); }
-			}
-
-			async function borrowBook() {
-				const title = document.getElementById('bookTitle').value;
-				const author = document.getElementById('bookAuthor').value;
-				try {
-					const res = await fetch(`${LIB_URL}/borrow`, {
-						method: 'POST',
-						headers: { 
-							'Content-Type': 'application/json',
-							'Authorization': `Bearer ${jwtToken}`
-						},
-						body: JSON.stringify({ book_title: title, author: author })
-					});
-					const data = await res.json();
-					logMsg(`Borrow: ${data.msg || JSON.stringify(data)}`);
-				} catch (err) { logMsg(`Borrow Error: ${err}`); }
-			}
-
-			async function returnBook() {
-				const title = document.getElementById('bookTitle').value;
-				try {
-					const res = await fetch(`${LIB_URL}/return`, {
-						method: 'POST',
-						headers: { 
-							'Content-Type': 'application/json',
-							'Authorization': `Bearer ${jwtToken}`
-						},
-						body: JSON.stringify({ book_title: title })
-					});
-					const data = await res.json();
-					logMsg(`Return: ${data.msg || JSON.stringify(data)}`);
-				} catch (err) { logMsg(`Return Error: ${err}`); }
-			}		
-			
-			// Initialize UI on load
-			updateUI();
-		</script>	
+							</div>									
 		
-    </body>
+							<!-- Library Section -->
+							<div class="card hidden" id="library-section">
+								<h2>Library Actions</h2>
+								<button onclick="logout()" style="background: #ef4444; margin-bottom: 1rem;">Logout</button>
+								<p id="signed-in" class="muted"></p>
+								
+								<h3>Borrow or Return a Book</h3>
+								<input type="text" id="bookTitle" placeholder="Book Title (e.g., Clean Code)">
+								<br>
+								<br>
+								<input type="text" id="bookAuthor" placeholder="Author (e.g., Robert C. Martin)">
+								<br>										
+								<div class="row">
+									<br>
+									<button onclick="borrowBook()">Borrow Book</button>
+									&#x2009;&#x2009;
+									<button onclick="returnBook()" style="background: #eab308; color: black;">Return Book</button>
+								</div>
+								
+								<h3>Your Borrowed Books <span id="book-count"></span></h3>
+								<div id="borrowed-list"></div>
+								
+								<hr style="margin: 1.5rem 0; border: 0; border-top: 1px solid #e4e4e7;">
+								
+								<h3>View Online Catalog</h3>
+								<input type="url" id="csvUrl" value="https://www.gutenberg.org/cache/epub/feeds/pg_catalog.csv">
+								<button onclick="fetchBooks()">Fetch Books ...</button>
+								<div id="catalog-list"></div>
+							</div>				
+						</td>
+					</tr>
+				</table>
+			</div>
+		</div>		
+	</div>
+  
+	<script>
+		// These URLs will be reachable from the browser.
+		const AUTH_URL = 'http://localhost:5000';
+		const LIB_URL = 'http://localhost:5001';
+
+		// The library service will provide GET /borrowed and return this user's loans.
+		const BORROWED_PATH = '/borrowed';
+		const TOKEN_KEY = 'library_jwt';
+		
+		let jwtToken = localStorage.getItem(TOKEN_KEY);
+		let fetchedCatalogBooks = null;
+		let borrowedBooks = [];
+		let userDeposit = 0;
+
+		function logMsg(message) {
+			const logEl = document.getElementById('log');
+			const time = new Date().toLocaleTimeString();
+			logEl.textContent = `[${time}] ${message}\n${logEl.textContent}`;
+		}
+
+		function showLoggedIn(isLoggedIn) {
+			document.getElementById('auth-section').classList.toggle('hidden', isLoggedIn);
+			document.getElementById('library-section').classList.toggle('hidden', !isLoggedIn);
+
+			const signedIn = document.getElementById('signed-in');
+
+			if (signedIn) {
+				signedIn.textContent = isLoggedIn
+				? `Logged in as ${document.getElementById('username').value.trim() || 'library user'}.Balance:$${userDeposit}.` : '';
+			}
+		}
+
+		function updateUI() {
+			const loggedIn = Boolean(jwtToken);
+			showLoggedIn(loggedIn);
+			
+			if (loggedIn) loadBorrowedBooks(true);
+			else { borrowedBooks = []; renderBorrowedBooks(); }
+		}
+
+		function authHeaders(json = false) {
+			const headers = {};
+			
+			if (json) headers['Content-Type'] = 'application/json';
+			if (jwtToken) headers.Authorization = `Bearer ${jwtToken}`;
+			return headers;
+		}
+
+		async function requestJson(url, options = {}) {
+			let response;
+			
+			try { response = await fetch(url, options); }
+			catch (error) {
+				throw new Error(`Cannot reach ${new URL(url).host}. Check that the Kubernetes service port. (${error.message})`);
+			}
+			
+			const raw = await response.text();
+			let data = {};
+			try { data = raw ? JSON.parse(raw) : {}; }
+			catch { data = { msg: raw || `HTTP ${response.status}` }; }
+			
+			if (!response.ok) {
+				const message = data.msg || data.message || data.error || `HTTP ${response.status}`;
+				throw new Error(`${message} (${response.status})`);
+			}
+			return data;
+		}
+
+		function responseMessage(data) { return data.msg || data.message || data.detail || 'Request completed.'; }
+
+		async function register() {
+			const username = document.getElementById('username').value.trim();
+			const password = document.getElementById('password').value;
+
+			if (!username || !password) {
+				logMsg('Register failed: enter both username/email and password.');
+				return;
+			}
+
+			try {
+				const data = await requestJson(`${AUTH_URL}/register`, {
+				method: 'POST',
+				headers: {'Content-Type':'application/json'},
+				body: JSON.stringify({username, password})
+			});
+
+			logMsg(`Register: ${responseMessage(data)}`);
+			// Register endpoints commonly return 200 or 201. Log in after either success.
+			await login(true);
+			} catch (error) { logMsg(`Register error: ${error.message}`); }
+		}
+
+		async function login(silent = false) {
+			const username = document.getElementById('username').value.trim();
+			const password = document.getElementById('password').value;
+			
+			if (!username || !password) {
+				if (!silent) logMsg('Login failed: enter both username/email and password.');
+					return;
+				}
+			try {
+				const data = await requestJson(`${AUTH_URL}/login`, {
+					method: 'POST',
+					headers: {'Content-Type':'application/json'},
+					body: JSON.stringify({username, password})
+				});
+			
+				const token = data.access_token || data.token;
+				if (!token) {
+					throw new Error(data.msg || data.message || 'Login response did not include access_token.');
+				}
+				
+				jwtToken = token;
+				localStorage.setItem(TOKEN_KEY, jwtToken);
+				document.getElementById('password').value = '';
+				showLoggedIn(true);
+				await loadBorrowedBooks(true);
+				
+				if (!silent) logMsg(`Login: ${responseMessage(data)}`);
+			} catch (error) {
+				logMsg(`${silent ? 'Automatic login failed' : 'Login error'}: ${error.message}`);
+			}
+		}
+
+		function logout() {
+			jwtToken = null; localStorage.removeItem(TOKEN_KEY); borrowedBooks = []; userDeposit = 0;
+			showLoggedIn(false); renderBorrowedBooks(); logMsg('Logged out.');
+		}
+
+		// Accept the common response.
+		function extractBooks(data) {
+			let items = data.books || data.borrowed_books || data.titles || data.borrowed || [];
+			
+			if (!Array.isArray(items) && Array.isArray(data.user?.titles)) {
+				items = data.user.titles.map((title, i) => ({title, due_date: data.user.returnDate?.[i]}));
+			}
+			
+			if (Array.isArray(items) && items.length && typeof items[0] === 'string') {
+				const dates = data.returnDate || data.return_dates || [];
+				items = items.map((title, i) => ({title, due_date: dates[i]}));
+			}
+			return Array.isArray(items) ? items.map(item => typeof item === 'string' ? {title:item} : item) : [];
+		}
+
+		function renderBorrowedBooks() {
+			const target = document.getElementById('borrowed-list');
+			const count = document.getElementById('book-count');
+			if (!target || !count) {
+				logMsg('Page setup error: missing borrowed-list or book-count element in index file.');
+				return;
+			}
+			count.textContent = jwtToken ? `(${borrowedBooks.length}/3)` : '';
+			target.replaceChildren();
+			
+			if (!jwtToken) { target.textContent = 'Log in to view borrowed books.'; return; }
+			if (!borrowedBooks.length) { target.textContent = 'No borrowed books found.'; return; }
+			
+			borrowedBooks.forEach(book => {
+				const row = document.createElement('div'); row.className = 'book';
+				const title = document.createElement('strong');
+				title.textContent = book.book_title || book.title || book.name || 'Untitled book';
+				row.appendChild(title);
+				const author = book.author ? document.createTextNode(` — ${book.author}`) : null;
+				
+				if (author) row.appendChild(author);
+				const due = book.due_date || book.return_date || book.returnDate;
+				
+				if (due) row.appendChild(document.createTextNode(` · Due ${due}`));
+					target.appendChild(row);
+			});
+		}
+
+		async function loadBorrowedBooks(quiet) {
+			if (!jwtToken) return;
+			try {
+				const data = await requestJson(`${LIB_URL}${BORROWED_PATH}`, {headers: authHeaders()});
+				if (data.deposit != undefined) userDeposit = Number(data.deposit) || 0;
+				borrowedBooks = extractBooks(data);
+				renderBorrowedBooks();
+				showLoggedIn(true);
+				
+				if (!quiet) logMsg(`Borrowed-book list refreshed (${borrowedBooks.length} book(s)).`);
+			} catch (error) {
+				renderBorrowedBooks();
+				logMsg(`Could not refresh borrowed-book list: ${error.message}.`);
+			}
+		}
+
+		function updateBooksFromResponse(data) {
+			const extracted = extractBooks(data);
+			if (data.deposit != undefined) userDeposit = Number(data.deposit) || 0;
+			
+			if (extracted.length || Array.isArray(data.books) || Array.isArray(data.borrowed_books) || Array.isArray(data.titles)) {
+				borrowedBooks = extracted;
+			}
+			showLoggedIn(Boolean(jwtToken));
+		}
+
+		async function borrowBook() {
+			const title = document.getElementById('bookTitle').value.trim();
+			const author = document.getElementById('bookAuthor').value.trim();
+			
+			if (!jwtToken) { logMsg('Borrow failed: log in first.'); return; }
+			if (title.length < 3) { logMsg('Borrow failed: enter a book title with at least 3 characters.'); return; }
+			
+			// Check first if the book exist in the catalog-list.
+			const titleExists = await fetchBooks(title);
+
+			if (titleExists === null) {
+			  logMsg('Borrow failed: fetch the catalog first.');
+			  return;
+			}
+			if (!titleExists) {
+			  logMsg(`Borrow failed: "${title}" is not in the fetched catalog.`);
+			  return;
+			}
+			
+			
+			try {
+				const data = await requestJson(`${LIB_URL}/borrow`, {
+					method: 'POST',
+					headers: authHeaders(true),
+					body: JSON.stringify({book_title:title, author})
+				});
+			
+				updateBooksFromResponse(data);
+				renderBorrowedBooks();
+				document.getElementById('bookTitle').value = '';
+				document.getElementById('bookAuthor').value = '';
+				
+				const due = data.due_date || data.return_date || data.returnDate;
+				logMsg(`Borrow: ${responseMessage(data)}${due ? ` · Return due: ${due}` : ''}`);
+				await loadBorrowedBooks(true);
+			} catch (error) {
+				logMsg(`Borrow error: ${error.message}`);
+			}
+		}
+
+		async function returnBook() {
+			const title = document.getElementById('bookTitle').value.trim();
+			
+			if (!jwtToken) { logMsg('Return failed: log in first.'); return; }
+			if (!title) { logMsg('Return failed: enter the title of the book to return.'); return; }
+			const paymentText = prompt('Payment to add toward an overdue fee (whole dollars; enter 0 to skip):', '0');
+			if (paymentText == null) return;
+			if (!/^\d+$/.test(paymentText.trim())) { logMsg('Return failed: payment must be a whole or more dollars.'); return; }
+			
+			try {
+				const data = await requestJson(`${LIB_URL}/return`, {
+					method: 'POST',
+					headers: authHeaders(true),
+					body: JSON.stringify({book_title:title, payment:Number(paymentText)})
+				});
+				updateBooksFromResponse(data);
+				renderBorrowedBooks();
+				document.getElementById('bookTitle').value = '';
+				const fee = data.fee_charged ?? data.fee ?? data.penalty;
+				logMsg(`Return: ${responseMessage(data)}${fee !== undefined ? ` · Fee: $${fee}` : ''}`);
+				await loadBorrowedBooks(true);
+			} catch (error) { logMsg(`Return error: ${error.message}`); }
+		}
+
+		async function fetchBooks(titleToCheck = null) {
+			// Called from borrowBook: check the catalog already fetched.
+			if (titleToCheck !== null) {
+				if (!fetchedCatalogBooks) return null;
+				const normalize = value =>
+				  String(value || '').trim().replace(/\s+/g, ' ').toLowerCase();
+
+				return fetchedCatalogBooks.some(book => {
+				  const catalogTitle =
+					typeof book === 'string' ? book : (book.title || book.Title || '');
+
+				  return normalize(catalogTitle) === normalize(titleToCheck);
+				});
+			}					
+			
+			// Called from the Fetch Books button: fetch, save, and display the catalog.
+			const url = document.getElementById('csvUrl').value.trim();
+			if (!jwtToken) { logMsg('Catalog request failed: log in first.'); return; }
+			if (!url) { logMsg('Catalog request failed: enter a CSV URL.'); return; }
+			
+			try {
+				const data = await requestJson(`${LIB_URL}/books?url=${encodeURIComponent(url)}`, {headers:authHeaders()});
+				const books = data.available_books || data.books || [];
+				fetchedCatalogBooks = books;
+				const target = document.getElementById('catalog-list');
+				target.replaceChildren();
+				books.slice(0, 30).forEach(book => {
+					const row = document.createElement('div');
+					row.className = 'book';
+					row.textContent = typeof book === 'string' ? book : (book.title || book.Title || JSON.stringify(book));
+					target.appendChild(row);
+				});
+				logMsg(`Catalog fetched: ${books.length} record(s).${books.length > 30 ? ' Showing the first 30.' : ''}`);
+				return true;
+			} catch (error) { logMsg(`Catalog error: ${error.message}`); }
+		}
+		
+		updateUI();
+	</script>
+</body>
 </html>
-
-

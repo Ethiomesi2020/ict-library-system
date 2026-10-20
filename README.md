@@ -20,13 +20,13 @@
 - [Start](#start)
 
 ## 🧐 About<a name = "about"></a>
-  The ICT Library System Will Help People To Borrow and Return 10 Books Maximum from Online Library Called Gutenberg General around 69,300 e-Books there for this Library will provide about 69,300 books at all for any registered members to borrow and return within a month per book otherwise users must pay $1 per day if they miss the return date.
+  The ICT Library System Will Help People To Borrow and Return 3 Books Maximum at a time from Online Library Called Gutenberg General e-Books there for this Library will provide about 69,300 books at all for any registered members to borrow and return within a 3 days per book otherwise users must pay $1 per day if they miss the return date.
 
 
 ## 🎈 Usage<a name="usage"></a>
 
   [Register]
-  This part will let the user sign in to the system and then save as a unique record in the existing Json file but the user must use a valid format of Gmail address as a unique Id and a strong password with a minimum of 4 characters from each group which means it must be a combination of alphanumeric character plus special characters.
+  This part will let the user sign in to the system and then save as a unique record in the existing Json file .
 
   [Login]
   This part let users to Login and then it remembers which user has login until it logout then it will let the user save all activity to the existing Json file with a unique record related to the current user.
@@ -35,15 +35,15 @@
   This part will list three options to the user after they login so 1st is to borrow a book, 2nd is to return the book and 3rd is to exit from the loop means they can logout of the system.
 
   [Borrow_Book]
-  This part will let users borrow max of ten books at a time and one-month duration for each book as long as they login first from all available libraries means a user can borrow the book from online general library. To do that the user must enter a book title then the system uses a search function to list the book title from the selected library including similar books if available or it returns to the main menu.
+  This part will let users borrow max of 3 books at a time and 3 days duration for each book as long as they login from all available libraries means a user can borrow the book from online general library. To do that the user must first featch all books title and type the book name or know the title of the book then the system uses a search function to list the book title from the selected library including similar books if available or it returns to the main menu.
 
   [Return_Book]
-  This part will let users return one book at a time from their own borrowed book list as long as they login first and also it checks that if the user misses the return date or not so if they miss that date then it will ask the user to pay $1 per day then the user has the option to pay whatever money they have at the time and the system will manage the difference for them. And also users can return to the main menu if they do not want to do this part.
+  This part will let users return one book at a time from their own borrowed book list as long as they login first and also it checks that if the user misses the return date or not so if they miss that date then it will ask the user to pay $1 per day then the user has the option to pay whatever money they have at the time and the system will manage the difference for them.
 
 
 ## 🏁 Start<a name = "start"></a>
 
-These instructions will let you copy the project and running on your local machine for development and testing purposes.
+These instructions will let you copy the project from github and running on your local machine for development and testing purposes.
 
 ### Prerequisites to Test
 
