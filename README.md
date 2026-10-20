@@ -9,9 +9,10 @@
 #### Description:
 
 <p align="center">
-    This Python Application Software is an ICT Library System Which Lend Books from Online Database to Registered Users Only.
+    This Kubernetes Application is an ICT Library System Which Lend Books from Online Database to Registered Users Only.
     <br>
 </p>
+
 
 ## 📝 Table of Contents
 
@@ -19,23 +20,21 @@
 - [Usage](#usage)
 - [Start](#start)
 
+
 ## 🧐 About<a name = "about"></a>
-  The ICT Library System Will Help People To Borrow and Return 3 Books Maximum at a time from Online Library Called Gutenberg General e-Books there for this Library will provide about 69,300 books at all for any registered members to borrow and return within a 3 days per book otherwise users must pay $1 per day if they miss the return date.
+  The ICT Library System Will Help People To Borrow and Return 3 Books Maximum at a time from Online Library Called Gutenberg General e-Books and the Library will provide about 69,300 books at all for any registered members to borrow and return within a 3 days per book otherwise users must pay $1 per day if they miss the return date.
 
 
 ## 🎈 Usage<a name="usage"></a>
 
-  [Register]
-  This part will let the user sign in to the system and then save as a unique record in the existing Json file .
+  [Register / Login / logout]
+  This part of auth-service Kubernetes service will let the user Register and automatically sign or logout or login if the user already registered first to the system and then save as a unique record in the existing Kubernetes postgres-db Database .
 
-  [Login]
-  This part let users to Login and then it remembers which user has login until it logout then it will let the user save all activity to the existing Json file with a unique record related to the current user.
-
-  [Main_Menu]
-  This part will list three options to the user after they login so 1st is to borrow a book, 2nd is to return the book and 3rd is to exit from the loop means they can logout of the system.
+  [Featch Books]
+  This part will list 30 most top books from online Gutenberg General e-Books lists for the user to see the books title and type them as there are at the book title in the text field to borrow.
 
   [Borrow_Book]
-  This part will let users borrow max of 3 books at a time and 3 days duration for each book as long as they login from all available libraries means a user can borrow the book from online general library. To do that the user must first featch all books title and type the book name or know the title of the book then the system uses a search function to list the book title from the selected library including similar books if available or it returns to the main menu.
+  This part will let users borrow max of 3 books at a time and 3 days duration for each book as long as they login. To do that the user must first featch all books title and type the book name or know the title of the book then the system uses a search function to list the book title from the selected library including similar books if available or it returns to the main menu.
 
   [Return_Book]
   This part will let users return one book at a time from their own borrowed book list as long as they login first and also it checks that if the user misses the return date or not so if they miss that date then it will ask the user to pay $1 per day then the user has the option to pay whatever money they have at the time and the system will manage the difference for them.
@@ -45,45 +44,75 @@
 
 These instructions will let you copy the project from github and running on your local machine for development and testing purposes.
 
+
 ### Prerequisites to Test
 
-  This Python Application Project Needs The Following:-
+Before running the project, ensure the base environment is running:
 
-- 1st - Intsallation of Python in the Local Machine.
-  Use this website link if you don't know how to install it.
+- WSL is installed and running with Ubuntu distribution.
+- Docker Desktop is open with the WSL integration enabled.
+- Kubernetes is enabled and running.
 
-  https://www.tutorialspoint.com/how-to-install-python-in-windows
 
-- 2nd - Under the project folder there will be a file called "requirements.txt" so you need to install it later and for now you can see them below the additional [requirements] (#requirements)
+### Requirements 
 
-### Requirements<a name = "requirements"></a>
-- pyfiglet
-- requests
-- validator_collection
+- Flask==3.1.0
+- Flask-Cors==4.0.0
+- Flask-SQLAlchemy==3.1.1
+- Flask-JWT-Extended==4.6.0
+- requests==2.31.0
+- Werkzeug==3.1.0
+- psycopg[binary]>=3.1,<4
 
-#### Getting Started
+
+#### Import the Project @WSL
 
 - $
 
-- $ wget https://github.com/Ethiomesi2020/Project_CS50P/archive/refs/heads/main.zip
+- $ git clone https://github.com/Ethiomesi2020/ict-library-system.git
 
-- unzip main.zip
+- cd ict-library-system
 
-- rm main.zip
+- ict-library-system$ ls
 
-- ren Project_CS50P-main project
+  README.md  auth-service  frontend  k8s  library-service
 
-- cd project
 
-- project $ ls
+#### Getting Started
 
-  README.md requirements.txt project.py files/......
+Use these commands in WSL terminal. Replace `your-username` with the actual project details like the existing docker user name of mine called messay2025.
 
-- pip install -r requirements.txt
+1. 	Clean up the old resources if there is,
+	Destroy the existing pods, services, and database volume to prevent conflicts, then remove the old Docker image.
+	
+	- cd ~/ict-library-system && kubectl delete -f ./k8s/
+	- docker rmi messay2025/ict-auth-service:latest messay2025/ict-library-service:latest -f && docker builder prune -a -f
+
+2. 	Build the new Docker image,
+	Compile the project's code into a fresh Docker image based on the `Dockerfile` in the current directory.
+
+	- docker build -t messay2025/ict-auth-service:latest ./auth-service && docker build -t messay2025/ict-library-service:latest ./library-service
+
+3. 	Push the image to the registry,
+	Push the newly built image to Docker Hub so Kubernetes can pull it.
+
+	- docker push messay2025/ict-auth-service:latest && docker push messay2025/ict-library-service:latest
+
+4. 	Apply Kubernetes configuration,
+	Tell Kubernetes to create the deployment and service using the YAML manifest files.
+
+	- cd ~/ICT_Library && kubectl apply -f ./k8s/
+
 
 #### Running
 
-- $ python project.py runserver
+5. 	Start frontend server,
+	Navigate to your frontend folder and launch the local web server so that we can access it in the web browser then leave this command running in the terminal.
 
-- http://127.0.0.1:5000/ 
+	- cd ~/ICT_Library/frontend && python3 -m http.server 8080
 
+
+6. 	View in Web Browser,
+	Open your web browser and navigate to the local address to verify the fresh deployment.
+
+	- http://localhost:8080
