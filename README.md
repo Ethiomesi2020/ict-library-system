@@ -4,12 +4,12 @@
 # <p align="center"> ICT Library </p>
 <br>
 
-#### Video Demo:  <https://youtu.be/cYVsAX6xL_c>
+#### Video Demo:  < >
 
 #### Description:
 
 <p align="center">
-    This Kubernetes Application is an ICT Library System Which Lend Books from Online Database to Registered Users Only.
+    This Kubernetes Application has three service which are auth-service, library-service and postgres-service so the application is an ICT Library System which Lend Books from Online Database to Registered Users Only.
     <br>
 </p>
 
@@ -28,16 +28,16 @@
 ## 🎈 Usage<a name="usage"></a>
 
   [Register / Login / logout]
-  This part of auth-service Kubernetes service will let the user Register and automatically sign or logout or login if the user already registered first to the system and then save as a unique record in the existing Kubernetes postgres-db Database .
+  This part will use auth-service Kubernetes service to let the user Register and automatically sign or logout or login if the user already registered first to the system and then save as a unique record in the existing Kubernetes postgres-db Database service.
 
   [Featch Books]
-  This part will list 30 most top books from online Gutenberg General e-Books lists for the user to see the books title and type them as there are at the book title in the text field to borrow.
+  This part will use library-service Kubernetes service to list 30 most top books from online Gutenberg General e-Books lists for the user to see the books title and type them as there are at the book title in the text field to borrow.
 
   [Borrow_Book]
-  This part will let users borrow max of 3 books at a time and 3 days duration for each book as long as they login. To do that the user must first featch all books title and type the book name or know the title of the book then the system uses a search function to list the book title from the selected library including similar books if available or it returns to the main menu.
+  This part will use library-service Kubernetes service to let users borrow max of 3 books at a time and 3 days duration for each book as long as they login. To do that the user must first featch all books title and type the book name or know the title of the book then the system uses a search function to list the book title from the selected library including similar books if available or it returns to the main menu.
 
   [Return_Book]
-  This part will let users return one book at a time from their own borrowed book list as long as they login first and also it checks that if the user misses the return date or not so if they miss that date then it will ask the user to pay $1 per day then the user has the option to pay whatever money they have at the time and the system will manage the difference for them.
+  This part will use library-service Kubernetes service to let users return one book at a time from their own borrowed book list as long as they login first and also it checks that if the user misses the return date or not so if they miss that date then it will ask the user to pay $1 per day then the user has the option to pay whatever money they have at the time and the system will manage the difference for them.
 
 
 ## 🏁 Start<a name = "start"></a>
@@ -116,3 +116,9 @@ Use these commands in WSL terminal. Replace `your-username` with the actual proj
 	Open your web browser and navigate to the local address to verify the fresh deployment.
 
 	- http://localhost:8080
+
+
+#### Reference (Source)
+
+	- Demo: https://youtu.be/cYVsAX6xL_c
+	- Link: https://github.com/Ethiomesi2020/Project_CS50P
