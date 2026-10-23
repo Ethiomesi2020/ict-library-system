@@ -112,9 +112,11 @@ Before running the project, ensure the base environment is running:
 
 - $ git clone https://github.com/Ethiomesi2020/ict-library-system.git
 
-- $ cd ict-library-system
+- $ mv ict-library-system ICT_Library
 
-- ict-library-system$ ls
+- $ cd ICT_Library
+
+- ICT_Library$ ls
 
   README.md  auth-service  frontend  k8s  library-service
 
@@ -130,7 +132,7 @@ Use these commands in WSL terminal. Replace `your-username` with the actual proj
 2. 	Clean up the old resources if there is,
 	Destroy the existing pods, services, and database volume to prevent conflicts, then remove the old Docker image.
 	
-	- cd ~/ict-library-system && kubectl delete -f ./k8s/
+	- cd ~/ICT_Library && kubectl delete -f ./k8s/
 	- docker rmi messay2025/ict-auth-service:latest messay2025/ict-library-service:latest -f && docker builder prune -a -f
 
 3. 	Build the new Docker image,
