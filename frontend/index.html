@@ -180,6 +180,7 @@
 				if (!silent) logMsg('Login failed: enter both username/email and password.');
 					return;
 				}
+			if ((username.length < 6) || (password.length < 6))) { logMsg('login failed: enter at least 6 characters for each box.'); return; }				
 			try {
 				const data = await requestJson(`${AUTH_URL}/login`, {
 					method: 'POST',
