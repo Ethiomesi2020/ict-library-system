@@ -16,7 +16,6 @@ spec:
       - name: auth
         image: messay2025/ict-auth-service:latest
         env:
-        # Notice how it connects using the name of the postgres-service defined above
         - name: DATABASE_URL
           value: "postgresql://user:pass@postgres-service:5432/librarydb"
         - name: JWT_SECRET
