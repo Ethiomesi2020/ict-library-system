@@ -4,7 +4,7 @@
 # <p align="center"> ICT Library </p>
 <br>
 
-#### Video Demo:  --- 
+#### Video Demo:  [Click ...](https://youtu.be/ZNe0gEWbTvQ)
 
 #### GitHub Link: https://github.com/Ethiomesi2020/ict-library-system
 
