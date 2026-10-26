@@ -45,9 +45,10 @@
 	Stores user accounts, borrowed-book records, and balances. Kubernetes keeps the database available to the other services inside the cluster and uses persistent storage for its data.
 
 5.	Kubernetes,
-	Kubernetes runs and restarts service replicas and exposes their APIs to the browser step by step. This means: 
+	Kubernetes runs and restarts service replicas and exposes their APIs on port 5000 and 5001 for the Auth Service and for the Library Service respectively to the browser Apps. This means: 
 	- The design uses separation of responsibilities, REST API communication, stateless JWT authentication, and container orchestration.
-	- The frontend calls the auth and library APIs only then those services access PostgreSQL.	
+	- The frontend calls the auth and library APIs only then those services access the backend PostgreSQL database exclusively through port 5432.
+ 	- And the YAML manifests define the exact deployment state for your Docker environment or cloud cluster, pulling images with the latest tag to spin up exactly three replicas for the Auth service, three replicas for the Library service, and a single replica for the database.
 
 
 ## 📘 Non-Functional Requirements<a name="NFR"></a>
